@@ -12,6 +12,7 @@ type KakaoMarker = { setMap(map: KakaoMap | null): void };
 type KakaoCircle = { setMap(map: KakaoMap | null): void };
 type KakaoPolyline = { setMap(map: KakaoMap | null): void };
 type KakaoPlace = { x: string; y: string; place_name: string; address_name: string };
+type KakaoAddressResult = { x: string; y: string };
 type KakaoPlaces = {
   keywordSearch(
     keyword: string,
@@ -19,11 +20,13 @@ type KakaoPlaces = {
     options?: { location?: KakaoLatLng; radius?: number; size?: number },
   ): void;
 };
-type KakaoNamespace = { maps: { load(callback: () => void): void; LatLng: new (lat: number, lng: number) => KakaoLatLng; Map: new (element: HTMLElement, options: object) => KakaoMap; Marker: new (options: object) => KakaoMarker; Circle: new (options: object) => KakaoCircle; Polyline: new (options: object) => KakaoPolyline; MarkerClusterer: new (options: { map: KakaoMap; averageCenter: boolean; minLevel: number; markers: KakaoMarker[] }) => object; event: { addListener(target: object, event: string, callback: () => void): void }; services: { Places: new () => KakaoPlaces; Status: { OK: string } } } };
+type KakaoGeocoder = { addressSearch(address: string, callback: (results: KakaoAddressResult[], status: string) => void): void };
+type KakaoNamespace = { maps: { load(callback: () => void): void; LatLng: new (lat: number, lng: number) => KakaoLatLng; Map: new (element: HTMLElement, options: object) => KakaoMap; Marker: new (options: object) => KakaoMarker; Circle: new (options: object) => KakaoCircle; Polyline: new (options: object) => KakaoPolyline; MarkerClusterer: new (options: { map: KakaoMap; averageCenter: boolean; minLevel: number; markers: KakaoMarker[] }) => object; event: { addListener(target: object, event: string, callback: () => void): void }; services: { Places: new () => KakaoPlaces; Geocoder: new () => KakaoGeocoder; Status: { OK: string } } } };
 declare global { interface Window { kakao?: KakaoNamespace } }
 
 const colors = { unknown: "#64748b", normal: "#0f766e", interest: "#ca8a04", caution: "#ea580c", warning: "#e11d48" };
 const verifiedRegionPositions = new Map<string, { latitude: number; longitude: number }>();
+const verifiedFacilityPositions = new Map<string, { latitude: number; longitude: number }>();
 
 export function KakaoMap({ records, selectedCode, onSelect, showWater = true, showDisease = true, showAlerts = true, visits = [], facilities = [], userPosition, className }: MapAdapterProps) {
   const container = useRef<HTMLDivElement>(null); const [status, setStatus] = useState<"loading"|"ready"|"fallback"|"error">("loading");
@@ -57,6 +60,21 @@ export function KakaoMap({ records, selectedCode, onSelect, showWater = true, sh
         const coordinates = verified ?? { latitude: record.latitude, longitude: record.longitude };
         return { record, position: new maps.LatLng(coordinates.latitude, coordinates.longitude) };
       }));
+      const geocoder = new maps.services.Geocoder();
+      const resolvedFacilities = await Promise.all(facilities.map(async (facility) => {
+        const cached = verifiedFacilityPositions.get(facility.id);
+        if (cached) return { facility, position: new maps.LatLng(cached.latitude, cached.longitude) };
+        const verified = await new Promise<{ latitude: number; longitude: number } | null>((resolve) => {
+          const address = facility.address.split(",")[0].replace(/\s*\([^)]*\).*$/, "").replace(/-0$/, "").trim();
+          geocoder.addressSearch(address, (results, searchStatus) => {
+            const latitude = Number(results[0]?.y); const longitude = Number(results[0]?.x);
+            resolve(searchStatus === maps.services.Status.OK && Number.isFinite(latitude) && Number.isFinite(longitude) ? { latitude, longitude } : null);
+          });
+        });
+        if (verified) verifiedFacilityPositions.set(facility.id, verified);
+        const coordinates = verified ?? { latitude: facility.latitude, longitude: facility.longitude };
+        return { facility, position: new maps.LatLng(coordinates.latitude, coordinates.longitude) };
+      }));
       if (!active) return;
       const positionByRegion = new Map(resolvedRecords.map(({ record, position }) => [record.regionCode, position]));
       resolvedRecords.forEach(({ record, position }) => {
@@ -67,14 +85,14 @@ export function KakaoMap({ records, selectedCode, onSelect, showWater = true, sh
       visits.forEach((visit) => { const position = positionByRegion.get(visit.regionCode); if (position) markers.push(new maps.Marker({ position: new maps.LatLng(position.getLat() - .0015, position.getLng()), title: `${visit.regionName} 사용자 방문 기록` })); });
       const routePath = [...visits].sort((a, b) => (a.sequence ?? 999) - (b.sequence ?? 999) || `${a.startDate}${a.startTime ?? ""}`.localeCompare(`${b.startDate}${b.startTime ?? ""}`)).map((visit) => positionByRegion.get(visit.regionCode)).filter((position): position is KakaoLatLng => Boolean(position));
       if (routePath.length > 1) { const routeLine = new maps.Polyline({ path: routePath, strokeWeight: 5, strokeColor: "#7c3aed", strokeOpacity: .85, strokeStyle: "solid" }); routeLine.setMap(map); }
-      facilities.forEach((facility) => markers.push(new maps.Marker({ position: new maps.LatLng(facility.latitude, facility.longitude), title: facility.name })));
+      resolvedFacilities.forEach(({ facility, position }) => markers.push(new maps.Marker({ position, title: facility.name })));
       if(userPosition&&userPosition.latitude>=34.75&&userPosition.latitude<=34.86&&userPosition.longitude>=126.33&&userPosition.longitude<=126.49){const current=new maps.LatLng(userPosition.latitude,userPosition.longitude);markers.push(new maps.Marker({position:current,title:"현재 위치 (저장하지 않음)"}));map.setCenter(current);}
       if (markers.length) new maps.MarkerClusterer({ map, averageCenter: true, minLevel: 6, markers });
       maps.event.addListener(map, "dragend", () => { const next = map.getCenter(); if (next.getLat() < 34.75 || next.getLat() > 34.86 || next.getLng() < 126.33 || next.getLng() > 126.49) map.setCenter(center); });
       setStatus("ready");
     });
     const existing = document.querySelector<HTMLScriptElement>('script[data-watersafe-kakao="true"]');
-    if (existing) initialize(); else { const script = document.createElement("script"); script.dataset.watersafeKakao = "true"; script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false&libraries=clusterer,services`; script.async = true; script.onload = initialize; script.onerror = () => setStatus("error"); document.head.appendChild(script); }
+    if (existing) { if (window.kakao) initialize(); else existing.addEventListener("load", initialize, { once: true }); } else { const script = document.createElement("script"); script.dataset.watersafeKakao = "true"; script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false&libraries=clusterer,services`; script.async = true; script.onload = initialize; script.onerror = () => setStatus("error"); document.head.appendChild(script); }
     return () => { active = false; };
   }, [key, records, selectedCode, onSelect, showWater, showDisease, showAlerts, visits, facilities, userPosition]);
 

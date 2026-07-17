@@ -8,10 +8,13 @@
     "phone": "061-280-7500",
     "latitude": 34.80435,
     "longitude": 126.42057,
-    "departments": ["내과", "소아청소년과", "응급의학과"],
+    "departments": [
+      "내과",
+      "응급의학과"
+    ],
     "hours": "진료시간·당일 진료 여부는 전화 확인",
     "emergency": true,
-    "distanceKm": 2.7,
+    "distanceKm": 2.719392203922678,
     "isMock": false
   },
   {
@@ -23,10 +26,13 @@
     "phone": "061-260-6500",
     "latitude": 34.803913,
     "longitude": 126.404882,
-    "departments": ["내과", "가정의학과", "응급의학과"],
+    "departments": [
+      "내과",
+      "응급의학과"
+    ],
     "hours": "진료시간·당일 진료 여부는 전화 확인",
     "emergency": true,
-    "distanceKm": 1.5,
+    "distanceKm": 1.4524952987425845,
     "isMock": false
   },
   {
@@ -38,10 +44,13 @@
     "phone": "061-270-5500",
     "latitude": 34.8094,
     "longitude": 126.41636,
-    "departments": ["내과", "소아청소년과", "응급의학과"],
+    "departments": [
+      "내과",
+      "응급의학과"
+    ],
     "hours": "권역응급의료센터 운영·수용 가능 여부는 119 확인",
     "emergency": true,
-    "distanceKm": 2.2,
+    "distanceKm": 2.2217940166318666,
     "isMock": false
   },
   {
@@ -53,10 +62,13 @@
     "phone": "061-280-3000",
     "latitude": 34.82088,
     "longitude": 126.42093,
-    "departments": ["내과", "소아청소년과", "응급의학과"],
-    "hours": "진료시간·응급실 수용 여부는 전화 또는 119 확인",
+    "departments": [
+      "내과",
+      "응급의학과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
     "emergency": true,
-    "distanceKm": 2.8,
+    "distanceKm": 2.8103736671041823,
     "isMock": false
   },
   {
@@ -68,10 +80,641 @@
     "phone": "061-260-6700",
     "latitude": 34.81693,
     "longitude": 126.38033,
-    "departments": ["내과"],
+    "departments": [
+      "내과"
+    ],
     "hours": "진료시간·당일 진료 여부는 전화 확인",
     "emergency": false,
-    "distanceKm": 1.2,
+    "distanceKm": 1.2246019866678246,
+    "isMock": false
+  },
+  {
+    "id": "national-mokpo-hospital",
+    "name": "국립목포병원",
+    "type": "hospital",
+    "regionCode": "46110770",
+    "address": "전라남도 목포시 신지마을1길 75 (석현동)",
+    "phone": "061-280-1114",
+    "latitude": 34.823,
+    "longitude": 126.4305,
+    "departments": [
+      "호흡기 진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.7115224568764753,
+    "isMock": false
+  },
+  {
+    "id": "madi-orthopedic-hospital",
+    "name": "마디정형외과병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 298, 4·5층 (상동)",
+    "phone": "061-287-0875",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "정형외과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-nodong-hospital",
+    "name": "목포노동병원",
+    "type": "hospital",
+    "regionCode": "46110650",
+    "address": "전라남도 목포시 수강로12번길 11-1 (행복동2가)",
+    "phone": "061-242-5621",
+    "latitude": 34.7836,
+    "longitude": 126.3841,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.22174203310035,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-mirae-hospital",
+    "name": "목포미래병원",
+    "type": "hospital",
+    "regionCode": "46110770",
+    "address": "전라남도 목포시 녹색로 41 (석현동)",
+    "phone": "061-800-1000",
+    "latitude": 34.823,
+    "longitude": 126.4305,
+    "departments": [
+      "정형외과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.7115224568764753,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-miz-i-hospital",
+    "name": "목포미즈아이병원",
+    "type": "hospital",
+    "regionCode": "46110780",
+    "address": "전라남도 목포시 백년대로 418 (옥암동)",
+    "phone": "061-260-8000",
+    "latitude": 34.8064,
+    "longitude": 126.444,
+    "departments": [
+      "소아청소년과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 4.767179165323303,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-shinsegae-hospital",
+    "name": "목포신세계병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 258 (상동)",
+    "phone": "061-274-9000",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "정형외과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-childrens-hospital",
+    "name": "목포아동병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 옥암로 149 (상동)",
+    "phone": "061-801-8000",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "소아청소년과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-yehyang-hospital",
+    "name": "목포예향병원",
+    "type": "hospital",
+    "regionCode": "46110545",
+    "address": "전라남도 목포시 삼학로223번길 38 (산정동)",
+    "phone": "061-245-0575",
+    "latitude": 34.8165,
+    "longitude": 126.3865,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 0.7375001440028313,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-jangmun-surgery-hospital",
+    "name": "목포장문외과병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 322 (상동)",
+    "phone": "061-284-0975",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "외과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-cheongdam-hospital",
+    "name": "목포청담병원",
+    "type": "hospital",
+    "regionCode": "46110545",
+    "address": "전라남도 목포시 청호로 109 (산정동)",
+    "phone": "061-272-3333",
+    "latitude": 34.8165,
+    "longitude": 126.3865,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 0.7375001440028313,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-hansarang-hospital",
+    "name": "목포한사랑병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 335 (상동)",
+    "phone": "061-280-5500",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-hyundai-hospital",
+    "name": "목포현대병원",
+    "type": "hospital",
+    "regionCode": "46110745",
+    "address": "전라남도 목포시 용당로 322-1 (용해동)",
+    "phone": "061-272-7588",
+    "latitude": 34.8181,
+    "longitude": 126.4054,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 1.3938672353597945,
+    "isMock": false
+  },
+  {
+    "id": "solton-hospital",
+    "name": "솔튼병원",
+    "type": "hospital",
+    "regionCode": "46110545",
+    "address": "전라남도 목포시 고하대로 724 (산정동)",
+    "phone": "061-272-7575",
+    "latitude": 34.8165,
+    "longitude": 126.3865,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 0.7375001440028313,
+    "isMock": false
+  },
+  {
+    "id": "sinan-hospital",
+    "name": "신안병원",
+    "type": "hospital",
+    "regionCode": "46110640",
+    "address": "전라남도 목포시 산정로 12 (동명동)",
+    "phone": "061-242-0505",
+    "latitude": 34.7877,
+    "longitude": 126.3926,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.68004660899827,
+    "isMock": false
+  },
+  {
+    "id": "jeil-internal-hospital",
+    "name": "제일내과병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 섶나루길 126, 2·6·8층 (상동)",
+    "phone": "061-287-8000",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "내과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "joyeon-ent-hospital",
+    "name": "조연이비인후과병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 298 (상동)",
+    "phone": "061-287-6610",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "이비인후과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-better-nursing-hospital",
+    "name": "목포더좋은요양병원",
+    "type": "hospital",
+    "regionCode": "46110745",
+    "address": "전라남도 목포시 용당로 334 (용해동)",
+    "phone": "061-246-7000",
+    "latitude": 34.8181,
+    "longitude": 126.4054,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 1.3938672353597945,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-rehabilitation-nursing-hospital",
+    "name": "목포재활요양병원",
+    "type": "hospital",
+    "regionCode": "46110770",
+    "address": "전라남도 목포시 영산로 627 (석현동)",
+    "phone": "061-280-6800",
+    "latitude": 34.823,
+    "longitude": 126.4305,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.7115224568764753,
+    "isMock": false
+  },
+  {
+    "id": "bubu-nursing-hospital",
+    "name": "부부요양병원",
+    "type": "hospital",
+    "regionCode": "46110770",
+    "address": "전라남도 목포시 영산로 620-1 (석현동)",
+    "phone": "061-989-9000",
+    "latitude": 34.823,
+    "longitude": 126.4305,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.7115224568764753,
+    "isMock": false
+  },
+  {
+    "id": "beautiful-nursing-hospital",
+    "name": "아름다운요양병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 267 (상동)",
+    "phone": "061-282-8100",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "okam-hill-nursing-hospital",
+    "name": "옥암힐요양병원",
+    "type": "hospital",
+    "regionCode": "46110780",
+    "address": "전라남도 목포시 남악1로52번길 11-4 (옥암동)",
+    "phone": "061-281-7554",
+    "latitude": 34.8064,
+    "longitude": 126.444,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 4.767179165323303,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-seongsim-nursing-hospital",
+    "name": "목포성심요양병원",
+    "type": "hospital",
+    "regionCode": "46110770",
+    "address": "전라남도 목포시 영산로844번길 13 (대양동)",
+    "phone": "061-283-5400",
+    "latitude": 34.823,
+    "longitude": 126.4305,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.7115224568764753,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-nursing-hospital",
+    "name": "목포요양병원",
+    "type": "hospital",
+    "regionCode": "46110650",
+    "address": "전라남도 목포시 해안로 243-3 (행복동1가)",
+    "phone": "061-276-3355",
+    "latitude": 34.7836,
+    "longitude": 126.3841,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.22174203310035,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-siloam-nursing-hospital",
+    "name": "목포실로암요양병원",
+    "type": "hospital",
+    "regionCode": "46110595",
+    "address": "전라남도 목포시 영산로 143 (호남동)",
+    "phone": "061-245-7777",
+    "latitude": 34.7917,
+    "longitude": 126.3847,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.3375727896904905,
+    "isMock": false
+  },
+  {
+    "id": "jeongdaun-nursing-hospital",
+    "name": "정다운요양병원",
+    "type": "hospital",
+    "regionCode": "46110770",
+    "address": "전라남도 목포시 영산로 710-11, 7동 (석현동)",
+    "phone": "061-288-9988",
+    "latitude": 34.823,
+    "longitude": 126.4305,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.7115224568764753,
+    "isMock": false
+  },
+  {
+    "id": "hyoseong-nursing-hospital",
+    "name": "효성요양병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 양을로 456 (상동)",
+    "phone": "061-800-5500",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "요양·재활"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mir-dental-hospital",
+    "name": "미르치과병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 319 (상동)",
+    "phone": "061-280-8800",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "치과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "yedam-dental-hospital",
+    "name": "예닮치과병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 비파로 91 (상동)",
+    "phone": "061-284-7528",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "치과"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "365-maeil-oriental-hospital",
+    "name": "365매일한방병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 하당로 253 (상동)",
+    "phone": "061-282-7365",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "dongmyeong-oriental-hospital",
+    "name": "동명한방병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 292 (상동)",
+    "phone": "061-245-3377",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "dongsin-mokpo-oriental-hospital",
+    "name": "동신대학교부속 목포한방병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 백년대로 313 (상동)",
+    "phone": "061-280-7700",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-wonkwang-oriental-hospital",
+    "name": "목포원광한방병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 하당로153번길 14 (상동)",
+    "phone": "061-283-8004",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "mokpo-cheongyeon-oriental-hospital",
+    "name": "목포청연한방병원",
+    "type": "hospital",
+    "regionCode": "46110595",
+    "address": "전라남도 목포시 청호로 6-1 (호남동)",
+    "phone": "061-982-3000",
+    "latitude": 34.7917,
+    "longitude": 126.3847,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.3375727896904905,
+    "isMock": false
+  },
+  {
+    "id": "seoul-oriental-hospital",
+    "name": "서울한방병원",
+    "type": "hospital",
+    "regionCode": "46110780",
+    "address": "전라남도 목포시 삼향천로 106 (옥암동)",
+    "phone": "061-287-8566",
+    "latitude": 34.8064,
+    "longitude": 126.444,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 4.767179165323303,
+    "isMock": false
+  },
+  {
+    "id": "yaksu-oriental-hospital",
+    "name": "약수한방병원",
+    "type": "hospital",
+    "regionCode": "46110770",
+    "address": "전라남도 목포시 옥암로 190, 2~5층 (석현동)",
+    "phone": "061-287-7585",
+    "latitude": 34.823,
+    "longitude": 126.4305,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 3.7115224568764753,
+    "isMock": false
+  },
+  {
+    "id": "pyeonan-oriental-hospital",
+    "name": "편안한방병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 옥암로 77-1 (상동)",
+    "phone": "061-287-8573",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
+    "isMock": false
+  },
+  {
+    "id": "hanguk-oriental-hospital",
+    "name": "한국한방병원",
+    "type": "hospital",
+    "regionCode": "46110756",
+    "address": "전라남도 목포시 옥암로 121, 1동 (상동)",
+    "phone": "061-261-0075",
+    "latitude": 34.8113,
+    "longitude": 126.4244,
+    "departments": [
+      "한방진료"
+    ],
+    "hours": "진료시간·당일 진료 여부는 전화 확인",
+    "emergency": false,
+    "distanceKm": 2.940219263300845,
     "isMock": false
   }
 ]
