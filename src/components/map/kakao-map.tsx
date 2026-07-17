@@ -10,10 +10,19 @@ type KakaoMap = { setCenter(position: KakaoLatLng): void; getCenter(): KakaoLatL
 type KakaoLatLng = { getLat(): number; getLng(): number };
 type KakaoMarker = { setMap(map: KakaoMap | null): void };
 type KakaoCircle = { setMap(map: KakaoMap | null): void };
-type KakaoNamespace = { maps: { load(callback: () => void): void; LatLng: new (lat: number, lng: number) => KakaoLatLng; Map: new (element: HTMLElement, options: object) => KakaoMap; Marker: new (options: object) => KakaoMarker; Circle: new (options: object) => KakaoCircle; MarkerClusterer: new (options: { map: KakaoMap; averageCenter: boolean; minLevel: number; markers: KakaoMarker[] }) => object; event: { addListener(target: object, event: string, callback: () => void): void } } };
+type KakaoPlace = { x: string; y: string; place_name: string; address_name: string };
+type KakaoPlaces = {
+  keywordSearch(
+    keyword: string,
+    callback: (results: KakaoPlace[], status: string) => void,
+    options?: { location?: KakaoLatLng; radius?: number; size?: number },
+  ): void;
+};
+type KakaoNamespace = { maps: { load(callback: () => void): void; LatLng: new (lat: number, lng: number) => KakaoLatLng; Map: new (element: HTMLElement, options: object) => KakaoMap; Marker: new (options: object) => KakaoMarker; Circle: new (options: object) => KakaoCircle; MarkerClusterer: new (options: { map: KakaoMap; averageCenter: boolean; minLevel: number; markers: KakaoMarker[] }) => object; event: { addListener(target: object, event: string, callback: () => void): void }; services: { Places: new () => KakaoPlaces; Status: { OK: string } } } };
 declare global { interface Window { kakao?: KakaoNamespace } }
 
 const colors = { unknown: "#64748b", normal: "#0f766e", interest: "#ca8a04", caution: "#ea580c", warning: "#e11d48" };
+const verifiedRegionPositions = new Map<string, { latitude: number; longitude: number }>();
 
 export function KakaoMap({ records, selectedCode, onSelect, showWater = true, showDisease = true, showAlerts = true, visits = [], facilities = [], userPosition, className }: MapAdapterProps) {
   const container = useRef<HTMLDivElement>(null); const [status, setStatus] = useState<"loading"|"ready"|"fallback"|"error">("loading");
@@ -21,18 +30,40 @@ export function KakaoMap({ records, selectedCode, onSelect, showWater = true, sh
   useEffect(() => {
     if (!key || !container.current) { setStatus("fallback"); return; }
     let active = true;
-    const initialize = () => window.kakao?.maps.load(() => {
+    const initialize = () => window.kakao?.maps.load(async () => {
       if (!active || !container.current || !window.kakao) return;
       const maps = window.kakao.maps; const center = new maps.LatLng(MOKPO_CENTER.latitude, MOKPO_CENTER.longitude);
       const map = new maps.Map(container.current, { center, level: 6, minLevel: 4, maxLevel: 8 });
       const markers: KakaoMarker[] = [];
-      records.forEach((record) => {
-        const position = new maps.LatLng(record.latitude, record.longitude);
+      const places = new maps.services.Places();
+      const resolvedRecords = await Promise.all(records.map(async (record) => {
+        const cached = verifiedRegionPositions.get(record.regionCode);
+        if (cached) return { record, position: new maps.LatLng(cached.latitude, cached.longitude) };
+
+        const verified = await new Promise<{ latitude: number; longitude: number } | null>((resolve) => {
+          places.keywordSearch(
+            `목포시 ${record.regionName} 행정복지센터`,
+            (results, searchStatus) => {
+              if (searchStatus !== maps.services.Status.OK) { resolve(null); return; }
+              const match = results.find((place) => place.address_name.includes("목포시") && place.place_name.includes("행정복지센터")) ?? results.find((place) => place.address_name.includes("목포시"));
+              const latitude = Number(match?.y); const longitude = Number(match?.x);
+              resolve(Number.isFinite(latitude) && Number.isFinite(longitude) ? { latitude, longitude } : null);
+            },
+            { location: center, radius: 20_000, size: 5 },
+          );
+        });
+        if (verified) verifiedRegionPositions.set(record.regionCode, verified);
+        const coordinates = verified ?? { latitude: record.latitude, longitude: record.longitude };
+        return { record, position: new maps.LatLng(coordinates.latitude, coordinates.longitude) };
+      }));
+      if (!active) return;
+      const positionByRegion = new Map(resolvedRecords.map(({ record, position }) => [record.regionCode, position]));
+      resolvedRecords.forEach(({ record, position }) => {
         if (showDisease) { const circle = new maps.Circle({ center: position, radius: selectedCode === record.regionCode ? 500 : 350, strokeWeight: selectedCode === record.regionCode ? 5 : 2, strokeColor: colors[record.riskLevel], strokeOpacity: 1, fillColor: colors[record.riskLevel], fillOpacity: .24 }); circle.setMap(map); }
-        if (showWater) { const waterPosition = new maps.LatLng(record.latitude + .0012, record.longitude - .0012); const waterColor = record.waterQualityStatus === "abnormal" ? "#c2410c" : record.waterQualityStatus === "unknown" ? "#64748b" : "#0284c7"; const waterCircle = new maps.Circle({ center: waterPosition, radius: 135, strokeWeight: 3, strokeColor: waterColor, strokeOpacity: 1, fillColor: waterColor, fillOpacity: .42 }); waterCircle.setMap(map); }
+        if (showWater) { const waterPosition = new maps.LatLng(position.getLat() + .0012, position.getLng() - .0012); const waterColor = record.waterQualityStatus === "abnormal" ? "#c2410c" : record.waterQualityStatus === "unknown" ? "#64748b" : "#0284c7"; const waterCircle = new maps.Circle({ center: waterPosition, radius: 135, strokeWeight: 3, strokeColor: waterColor, strokeOpacity: 1, fillColor: waterColor, fillOpacity: .42 }); waterCircle.setMap(map); }
         if (showDisease || (showAlerts && ["caution", "warning"].includes(record.riskLevel))) { const marker = new maps.Marker({ position, title: `${record.regionName} ${RISK_META[record.riskLevel].label}` }); markers.push(marker); maps.event.addListener(marker, "click", () => onSelect?.(record.regionCode)); }
       });
-      visits.forEach((visit) => { const region = records.find((item) => item.regionCode === visit.regionCode); if (region) markers.push(new maps.Marker({ position: new maps.LatLng(region.latitude - .0015, region.longitude), title: `${region.regionName} 사용자 방문 기록` })); });
+      visits.forEach((visit) => { const position = positionByRegion.get(visit.regionCode); if (position) markers.push(new maps.Marker({ position: new maps.LatLng(position.getLat() - .0015, position.getLng()), title: `${visit.regionName} 사용자 방문 기록` })); });
       facilities.forEach((facility) => markers.push(new maps.Marker({ position: new maps.LatLng(facility.latitude, facility.longitude), title: `${facility.name} 예시 의료기관` })));
       if(userPosition&&userPosition.latitude>=34.75&&userPosition.latitude<=34.86&&userPosition.longitude>=126.33&&userPosition.longitude<=126.49){const current=new maps.LatLng(userPosition.latitude,userPosition.longitude);markers.push(new maps.Marker({position:current,title:"현재 위치 (저장하지 않음)"}));map.setCenter(current);}
       if (markers.length) new maps.MarkerClusterer({ map, averageCenter: true, minLevel: 6, markers });
@@ -40,12 +71,12 @@ export function KakaoMap({ records, selectedCode, onSelect, showWater = true, sh
       setStatus("ready");
     });
     const existing = document.querySelector<HTMLScriptElement>('script[data-watersafe-kakao="true"]');
-    if (existing) initialize(); else { const script = document.createElement("script"); script.dataset.watersafeKakao = "true"; script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false&libraries=clusterer`; script.async = true; script.onload = initialize; script.onerror = () => setStatus("error"); document.head.appendChild(script); }
+    if (existing) initialize(); else { const script = document.createElement("script"); script.dataset.watersafeKakao = "true"; script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false&libraries=clusterer,services`; script.async = true; script.onload = initialize; script.onerror = () => setStatus("error"); document.head.appendChild(script); }
     return () => { active = false; };
   }, [key, records, selectedCode, onSelect, showWater, showDisease, showAlerts, visits, facilities, userPosition]);
 
   if (status === "fallback" || status === "error") return <SchematicMap records={records} selectedCode={selectedCode} onSelect={onSelect} className={className} error={status === "error"} />;
-  return <div className={cn("relative min-h-[430px] overflow-hidden rounded-2xl border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-900", className)}><div ref={container} className="absolute inset-0" aria-label="목포시 Kakao 위험 지도" />{status === "loading" && <div className="absolute inset-0 grid place-items-center"><RefreshCw className="size-7 animate-spin" aria-label="Kakao Maps 불러오는 중" /></div>}<div className="absolute bottom-3 left-3 rounded-lg bg-white/95 px-3 py-2 text-xs font-bold shadow dark:bg-slate-950/95">영역은 행정동 중심 기반 예시 원이며 실제 경계가 아닙니다.</div></div>;
+  return <div className={cn("relative min-h-[430px] overflow-hidden rounded-2xl border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-900", className)}><div ref={container} className="absolute inset-0" aria-label="목포시 Kakao 위험 지도" />{status === "loading" && <div className="absolute inset-0 grid place-items-center"><RefreshCw className="size-7 animate-spin" aria-label="Kakao Maps 불러오는 중" /></div>}<div className="absolute bottom-3 left-3 rounded-lg bg-white/95 px-3 py-2 text-xs font-bold shadow dark:bg-slate-950/95">마커는 행정복지센터 검색 결과를 대표 지점으로 사용하며, 원은 실제 행정동 경계가 아닙니다.</div></div>;
 }
 
 function SchematicMap({ records, selectedCode, onSelect, showWater = true, showDisease = true, showAlerts = true, visits = [], facilities = [], userPosition, className, error }: MapAdapterProps & { error?: boolean }) {
