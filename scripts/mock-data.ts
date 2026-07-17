@@ -6,6 +6,7 @@ import { SCENARIOS } from "../src/config/scenarios";
 import { HEALTHCARE_FACILITIES } from "../src/data/facilities";
 import { createDemoMovementRoute } from "../src/data/demo-movement-route";
 import { generateRecords } from "../src/features/simulation/generate";
+import { seededRandom } from "../src/features/simulation/random";
 
 const root = path.resolve(process.cwd(), "data/mock");
 const command = process.argv[2] ?? "generate";
@@ -23,7 +24,7 @@ async function generate(selectedScenario = scenarioId) {
     writeJson("regions.json", REGIONS.map((region) => ({ ...region, isMock: true, boundaryType: "approximate-center" }))),
     writeJson("water-quality.json", records), writeJson("disease-cases.json", records), writeJson("health-alerts.json", alerts),
     writeJson("healthcare-facilities.json", scenario.flags?.noFacilities ? [] : HEALTHCARE_FACILITIES),
-    writeJson("visit-history.json", createDemoMovementRoute(date)),
+    writeJson("visit-history.json", createDemoMovementRoute(date, seededRandom(`${seed}-route`))),
     writeJson("scenarios.json", SCENARIOS.map((item) => ({ ...item, isMock: true }))), writeJson("region-adjacency.json", REGION_ADJACENCY),
   ]);
   console.log(`Generated 8 mock files: scenario=${scenario.id}, date=${date}, seed=${seed}`);

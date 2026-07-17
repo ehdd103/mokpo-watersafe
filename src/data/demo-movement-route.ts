@@ -1,23 +1,59 @@
+import { REGIONS } from "@/config/regions";
 import type { Visit } from "@/types";
 
-const STOPS = [
-  { regionCode: "46110554", regionName: "연산동", startTime: "07:40", endTime: "08:20", note: "가상 출발 · 연산동 주거지 인근" },
-  { regionCode: "46110745", regionName: "용해동", startTime: "08:35", endTime: "09:10", note: "가상 경유 · 용해동 생활권" },
-  { regionCode: "46110756", regionName: "상동", startTime: "09:30", endTime: "11:20", note: "가상 방문 · 목포종합버스터미널 인근" },
-  { regionCode: "46110757", regionName: "하당동", startTime: "12:00", endTime: "13:20", note: "가상 방문 · 하당 상업지구" },
-  { regionCode: "46110780", regionName: "옥암동", startTime: "14:00", endTime: "15:30", note: "가상 방문 · 옥암동 생활권" },
-  { regionCode: "46110800", regionName: "부주동", startTime: "16:00", endTime: "17:20", note: "가상 도착 · 부주동 주거지 인근" },
-] as const;
+type RandomSource = () => number;
 
-export function createDemoMovementRoute(date: string): Visit[] {
-  return STOPS.map((stop, index) => ({
-    id: `demo-route-${date}-${index + 1}`,
-    ...stop,
-    startDate: date,
-    endDate: date,
-    sequence: index + 1,
-    consent: false,
-    createdAt: `${date}T${stop.startTime}:00+09:00`,
-    isMock: true,
-  }));
+const MIN_STOPS = 4;
+const MAX_STOPS = 6;
+const DAY_START_MINUTES = 7 * 60;
+const DAY_START_RANGE_MINUTES = 120;
+
+function randomInt(min: number, max: number, random: RandomSource) {
+  const value = Math.min(Math.max(random(), 0), 0.999999999);
+  return min + Math.floor(value * (max - min + 1));
+}
+
+function formatTime(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60).toString().padStart(2, "0");
+  const minutes = (totalMinutes % 60).toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+function createRouteId(random: RandomSource) {
+  if (typeof globalThis.crypto?.randomUUID === "function") return globalThis.crypto.randomUUID();
+  return `${Date.now()}-${Math.floor(random() * 1_000_000_000)}`;
+}
+
+export function createDemoMovementRoute(date: string, random: RandomSource = Math.random): Visit[] {
+  const availableRegions = [...REGIONS];
+  const stopCount = randomInt(MIN_STOPS, MAX_STOPS, random);
+  const selectedRegions = Array.from({ length: stopCount }, () => {
+    const index = randomInt(0, availableRegions.length - 1, random);
+    return availableRegions.splice(index, 1)[0];
+  });
+  const routeId = createRouteId(random);
+  let cursor = DAY_START_MINUTES + randomInt(0, DAY_START_RANGE_MINUTES, random);
+
+  return selectedRegions.map((region, index) => {
+    const startTime = formatTime(cursor);
+    const endMinutes = cursor + randomInt(35, 75, random);
+    const endTime = formatTime(endMinutes);
+    const label = index === 0 ? "출발" : index === selectedRegions.length - 1 ? "도착" : "경유";
+    cursor = endMinutes + randomInt(15, 35, random);
+
+    return {
+      id: `demo-route-${date}-${routeId}-${index + 1}`,
+      regionCode: region.code,
+      regionName: region.name,
+      note: `가상 ${label} · ${region.name} 생활권`,
+      startDate: date,
+      endDate: date,
+      startTime,
+      endTime,
+      sequence: index + 1,
+      consent: false,
+      createdAt: `${date}T${startTime}:00+09:00`,
+      isMock: true,
+    };
+  });
 }
