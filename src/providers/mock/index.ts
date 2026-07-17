@@ -1,5 +1,5 @@
 import { SCENARIOS } from "@/config/scenarios";
-import { MOCK_FACILITIES } from "@/data/facilities";
+import { HEALTHCARE_FACILITIES } from "@/data/facilities";
 import { generateRecords } from "@/features/simulation/generate";
 import type { DiseaseCaseProvider, HealthAlertProvider, HealthcareFacilityProvider, WaterQualityProvider } from "@/providers/contracts";
 import type { Scenario } from "@/types";
@@ -30,7 +30,7 @@ export class MockHealthAlertProvider extends MockDataSource implements HealthAle
 }
 export class MockHealthcareFacilityProvider implements HealthcareFacilityProvider {
   constructor(private scenario: Scenario) {}
-  async getFacilities() { return this.scenario.flags?.noFacilities ? [] : MOCK_FACILITIES; }
+  async getFacilities() { return this.scenario.flags?.noFacilities ? [] : HEALTHCARE_FACILITIES; }
 }
 
 export function createMockProviders(scenarioId: string) {

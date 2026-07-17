@@ -3,7 +3,7 @@ import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import { REGIONS, REGION_ADJACENCY } from "../src/config/regions";
 import { SCENARIOS } from "../src/config/scenarios";
-import { MOCK_FACILITIES } from "../src/data/facilities";
+import { HEALTHCARE_FACILITIES } from "../src/data/facilities";
 import { generateRecords } from "../src/features/simulation/generate";
 
 const root = path.resolve(process.cwd(), "data/mock");
@@ -21,7 +21,7 @@ async function generate(selectedScenario = scenarioId) {
   await Promise.all([
     writeJson("regions.json", REGIONS.map((region) => ({ ...region, isMock: true, boundaryType: "approximate-center" }))),
     writeJson("water-quality.json", records), writeJson("disease-cases.json", records), writeJson("health-alerts.json", alerts),
-    writeJson("healthcare-facilities.json", scenario.flags?.noFacilities ? [] : MOCK_FACILITIES),
+    writeJson("healthcare-facilities.json", scenario.flags?.noFacilities ? [] : HEALTHCARE_FACILITIES),
     writeJson("visit-history.json", [{ id: "demo-visit-sang", regionCode: "46110756", regionName: "상동", note: "발표용 예시", startDate: "2026-07-12", endDate: "2026-07-12", consent: true, createdAt: "2026-07-12T10:00:00+09:00", isMock: true }]),
     writeJson("scenarios.json", SCENARIOS.map((item) => ({ ...item, isMock: true }))), writeJson("region-adjacency.json", REGION_ADJACENCY),
   ]);
@@ -39,7 +39,7 @@ async function seedDatabase() {
   await run("mock_water_quality_records", records.map((item) => ({ external_id: item.id, region_code: item.regionCode, risk_level: item.riskLevel, risk_score: item.riskScore, water_quality_status: item.waterQualityStatus, pollutant_type: item.pollutantType, measured_value: item.measuredValue, threshold_value: item.thresholdValue, observed_at: item.observedAt, published_at: item.publishedAt, expires_at: item.expiresAt, reasons: item.reasons, confidence: item.confidence, missing_data: item.missingData, is_mock: true, scenario_id: item.scenarioId })), "external_id");
   await run("mock_disease_case_records", records.map((item) => ({ external_id: item.id, region_code: item.regionCode, risk_level: item.riskLevel, risk_score: item.riskScore, disease_type: item.diseaseType, confirmed_case_count: item.confirmedCaseCount, suspected_case_count: item.suspectedCaseCount, water_quality_status: item.waterQualityStatus, pollutant_type: item.pollutantType, measured_value: item.measuredValue, threshold_value: item.thresholdValue, observed_at: item.observedAt, published_at: item.publishedAt, expires_at: item.expiresAt, reasons: item.reasons, confidence: item.confidence, missing_data: item.missingData, is_mock: true, scenario_id: item.scenarioId })), "external_id");
   await run("mock_health_alerts", alerts.map((item) => ({ external_id: item.id, region_code: item.regionCode, title: item.title, description: item.description, risk_level: item.level, starts_at: item.startsAt, ends_at: item.endsAt, published_at: item.publishedAt, active: item.active, is_mock: true })), "external_id");
-  await run("mock_healthcare_facilities", MOCK_FACILITIES.map((item) => ({ external_id: item.id, region_code: item.regionCode, name: item.name, facility_type: item.type, address: item.address, phone: item.phone, latitude: item.latitude, longitude: item.longitude, departments: item.departments, hours: item.hours, emergency: item.emergency, is_mock: true })), "external_id");
+  await run("mock_healthcare_facilities", HEALTHCARE_FACILITIES.map((item) => ({ external_id: item.id, region_code: item.regionCode, name: item.name, facility_type: item.type, address: item.address, phone: item.phone, latitude: item.latitude, longitude: item.longitude, departments: item.departments, hours: item.hours, emergency: item.emergency, is_mock: false })), "external_id");
   console.log("Supabase mock seed completed.");
 }
 

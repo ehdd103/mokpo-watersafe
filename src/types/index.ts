@@ -91,7 +91,7 @@ export type HealthcareFacility = {
   hours: string;
   emergency: boolean;
   distanceKm: number;
-  isMock: true;
+  isMock: boolean;
 };
 
 export type NotificationItem = {
