@@ -1,0 +1,1 @@
+import type{Metadata}from"next";import{FacilityFinder}from"@/components/hospitals/facility-finder";export const metadata:Metadata={title:"주변 의료기관 찾기"};export default function FacilitiesPage(){return <FacilityFinder/>}

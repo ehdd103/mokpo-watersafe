@@ -1,0 +1,1 @@
+export default function Loading() { return <div aria-label="페이지 로딩 중" className="space-y-4 animate-pulse"><div className="h-10 w-64 rounded-xl bg-slate-200 dark:bg-slate-800"/><div className="grid gap-4 md:grid-cols-3">{[1,2,3].map((item)=><div key={item} className="h-36 rounded-2xl bg-slate-200 dark:bg-slate-800"/>)}</div></div>; }

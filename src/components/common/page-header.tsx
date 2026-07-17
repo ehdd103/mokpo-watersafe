@@ -1,0 +1,2 @@
+import { Badge } from "@/components/ui/badge";
+export function PageHeader({ title, description, actions }: { title: string; description: string; actions?: React.ReactNode }) { return <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><Badge className="mb-2">가상 데이터 · 해커톤 시연</Badge><h1 className="text-3xl font-black tracking-tight sm:text-4xl">{title}</h1><p className="mt-2 max-w-3xl text-slate-600 dark:text-slate-400">{description}</p></div>{actions}</div>; }

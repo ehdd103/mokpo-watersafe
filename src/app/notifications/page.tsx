@@ -1,0 +1,1 @@
+import type{Metadata}from"next";import{NotificationCenter}from"@/components/notifications/notification-center";export const metadata:Metadata={title:"알림"};export default function NotificationsPage(){return <NotificationCenter/>}

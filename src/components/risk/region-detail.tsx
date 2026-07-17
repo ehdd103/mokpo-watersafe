@@ -1,0 +1,28 @@
+"use client";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { format, parseISO, subDays } from "date-fns";
+import { AlertCircle, Clock3, Database, Heart, Hospital, Plus, ShieldCheck } from "lucide-react";
+import { useMemo } from "react";
+import { PageHeader } from "@/components/common/page-header";
+import { RiskBadge } from "@/components/common/risk-badge";
+import { useAppStore } from "@/components/providers/app-store";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getRiskRecords } from "@/services/risk-service";
+import { MOCK_FACILITIES } from "@/data/facilities";
+
+const TrendChart=dynamic(()=>import("@/components/dashboard/trend-chart").then((module)=>module.TrendChart),{ssr:false,loading:()=> <div className="h-64 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800"/>});
+
+export function RegionDetail({ code }: { code: string }) {
+  const { records, date, scenarioId, seed, simulationSettings, favorites, toggleFavorite }=useAppStore(); const record=records.find((item)=>item.regionCode===code);
+  const trend=useMemo(()=>Array.from({length:7},(_,index)=>{const day=format(subDays(parseISO(date),6-index),"yyyy-MM-dd");const item=getRiskRecords(scenarioId,day,{...simulationSettings,seed}).find((value)=>value.regionCode===code);return {date:format(parseISO(day),"M/d"),cases:item?.confirmedCaseCount??0,anomalies:item?.waterQualityStatus==="abnormal"?1:0};}),[code,date,scenarioId,seed,simulationSettings]);
+  if(!record)return <div className="rounded-2xl border border-amber-300 bg-amber-50 p-8"><h1 className="text-2xl font-bold">행정동 정보 없음</h1><p className="mt-2">요청한 행정동 코드의 가상 데이터를 찾을 수 없습니다.</p><Link href="/map" className="mt-4 inline-block font-bold underline">지도로 돌아가기</Link></div>;
+  const nearby=[...new Map(MOCK_FACILITIES.filter((item)=>item.regionCode===code).concat(MOCK_FACILITIES).map((item)=>[item.id,item])).values()].slice(0,2);
+  return <><PageHeader title={`${record.regionName} 상세`} description={`${date} 기준 가상 위험 분석 · 실제 감염 여부를 판단하거나 단정하지 않습니다.`} actions={<Button variant="outline" onClick={()=>toggleFavorite(code)}><Heart className={`size-4 ${favorites.includes(code)?"fill-rose-500 text-rose-500":""}`}/>{favorites.includes(code)?"관심 지역 해제":"관심 지역 추가"}</Button>}/>
+    <section className="grid gap-4 md:grid-cols-4"><Card className="md:col-span-2"><CardContent className="pt-5"><p className="text-sm font-bold">종합 가상 위험 단계</p><div className="mt-3 flex flex-wrap items-center gap-3"><RiskBadge level={record.riskLevel} score={record.riskScore} className="text-base"/><span className="text-sm">신뢰도 {record.confidence}</span></div><ul className="mt-5 space-y-2 text-sm">{record.reasons.map((reason)=><li key={reason} className="flex gap-2"><AlertCircle className="mt-0.5 size-4 shrink-0 text-amber-600"/>{reason}</li>)}</ul></CardContent></Card>{[{label:"가상 확진 건수",value:record.confirmedCaseCount},{label:"가상 의심 사례",value:record.suspectedCaseCount}].map((item)=><Card key={item.label}><CardContent className="pt-5"><p className="text-sm text-slate-500">{item.label}</p><p className="mt-2 text-4xl font-black">{item.value}</p><p className="mt-2 text-xs">행정동 집계형 가상 수치</p></CardContent></Card>)}</section>
+    <section className="mt-4 grid gap-4 lg:grid-cols-2"><Card><CardHeader><CardTitle>가상 수질 측정</CardTitle><CardDescription>가상 기준치이며 실제 검사 결과가 아닙니다.</CardDescription></CardHeader><CardContent><dl className="grid grid-cols-2 gap-3 text-sm"><div><dt className="text-slate-500">상태</dt><dd className="font-bold">{record.waterQualityStatus}</dd></div><div><dt className="text-slate-500">오염 물질</dt><dd className="font-bold">{record.pollutantType}</dd></div><div><dt className="text-slate-500">측정값</dt><dd className="font-bold">{record.measuredValue??"누락"}</dd></div><div><dt className="text-slate-500">가상 기준치</dt><dd className="font-bold">{record.thresholdValue??"누락"}</dd></div></dl></CardContent></Card><Card><CardHeader><CardTitle>데이터 상태</CardTitle></CardHeader><CardContent className="space-y-3 text-sm"><p className="flex gap-2"><Clock3 className="size-4"/>관측 {record.observedAt}</p><p className="flex gap-2"><Database className="size-4"/>게시 {record.publishedAt}</p><p>최신성: {record.confidence==="low"?"낮음/확인 필요":"시연 기준 최신"}</p><p>누락 데이터: {record.missingData?"있음":"없음"}</p></CardContent></Card></section>
+    <Card className="mt-4"><CardHeader><CardTitle>최근 7일 변화</CardTitle><CardDescription>선택한 시나리오와 seed로 재현된 가상 추세</CardDescription></CardHeader><CardContent><TrendChart data={trend}/></CardContent></Card>
+    <section className="mt-4 grid gap-4 lg:grid-cols-2"><Card><CardHeader><CardTitle>주변 예시 의료기관</CardTitle></CardHeader><CardContent className="space-y-3">{nearby.map((item)=><div key={item.id} className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800"><strong>{item.name}</strong><p className="text-sm text-slate-500">{item.address} · {item.hours}</p></div>)}<Link href="/facilities" className="inline-flex items-center gap-2 font-bold text-cyan-700"><Hospital className="size-4"/>전체 기관 찾기</Link></CardContent></Card><Card><CardHeader><CardTitle>다음 행동</CardTitle></CardHeader><CardContent className="grid gap-2"><Link href={`/visits?region=${code}`} className="flex items-center justify-center gap-2 rounded-xl bg-cyan-700 px-4 py-3 font-bold text-white"><Plus className="size-4"/>방문 이력 추가</Link><Link href="/safety" className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-3 font-bold dark:border-slate-700"><ShieldCheck className="size-4"/>일반 안전수칙</Link></CardContent></Card></section>
+  </>;
+}

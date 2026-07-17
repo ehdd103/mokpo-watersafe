@@ -1,0 +1,9 @@
+import type { HealthcareFacility } from "@/types";
+
+export const MOCK_FACILITIES: HealthcareFacility[] = [
+  { id: "facility-1", name: "목포안심병원", type: "hospital", regionCode: "46110756", address: "목포시 상동 가상로 12", phone: "061-000-1001", latitude: 34.8102, longitude: 126.423, departments: ["내과", "소아청소년과"], hours: "평일 09:00~18:00 (예시)", emergency: false, distanceKm: 0.8, isMock: true },
+  { id: "facility-2", name: "유달응급의료센터", type: "emergency", regionCode: "46110660", address: "목포시 유달동 예시길 8", phone: "061-000-1190", latitude: 34.7892, longitude: 126.375, departments: ["응급의학과"], hours: "24시간 (시연 정보)", emergency: true, distanceKm: 2.9, isMock: true },
+  { id: "facility-3", name: "목포중앙보건센터", type: "health-center", regionCode: "46110595", address: "목포시 목원동 안전로 21", phone: "061-000-2001", latitude: 34.7925, longitude: 126.386, departments: ["건강상담", "감염예방"], hours: "평일 09:00~18:00 (예시)", emergency: false, distanceKm: 2.2, isMock: true },
+  { id: "facility-4", name: "하당워터케어의원", type: "clinic", regionCode: "46110757", address: "목포시 하당동 푸른길 5", phone: "061-000-3001", latitude: 34.804, longitude: 126.42, departments: ["내과"], hours: "평일 09:00~19:00 (예시)", emergency: false, distanceKm: 1.1, isMock: true },
+  { id: "facility-5", name: "북항안심의원", type: "clinic", regionCode: "46110705", address: "목포시 북항동 가상대로 44", phone: "061-000-3002", latitude: 34.813, longitude: 126.366, departments: ["가정의학과"], hours: "평일 09:00~18:00 (예시)", emergency: false, distanceKm: 4.3, isMock: true },
+];

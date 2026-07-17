@@ -1,0 +1,1 @@
+import type {Metadata} from "next";import{PersonalRiskCheck}from"@/components/risk/personal-risk-check";export const metadata:Metadata={title:"개인 위험 확인"};export default function RiskCheckPage(){return <PersonalRiskCheck/>}

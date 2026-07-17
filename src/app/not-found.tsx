@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound() { return <div className="py-20 text-center"><p className="text-7xl font-black text-cyan-700">404</p><h1 className="mt-4 text-2xl font-bold">페이지를 찾을 수 없습니다</h1><p className="mt-2 text-slate-600 dark:text-slate-400">요청한 행정동 또는 페이지 정보가 없습니다.</p><Link href="/" className="mt-6 inline-block rounded-xl bg-cyan-700 px-5 py-3 font-bold text-white">홈으로 이동</Link></div>; }

@@ -1,0 +1,1 @@
+import type{Metadata}from"next";import{AdminPanel}from"@/components/admin/admin-panel";export const metadata:Metadata={title:"관리자·데모 제어",robots:{index:false,follow:false}};export default function AdminPage(){return <AdminPanel/>}

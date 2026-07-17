@@ -1,0 +1,56 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { addDays, format, parseISO } from "date-fns";
+import { FastForward, Maximize, Minimize, Pause, Play, RefreshCw, Rewind } from "lucide-react";
+import { useEffect, useState } from "react";
+import { PageHeader } from "@/components/common/page-header";
+import { RiskBadge } from "@/components/common/risk-badge";
+import { useAppStore } from "@/components/providers/app-store";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { REGIONS } from "@/config/regions";
+import { SCENARIOS } from "@/config/scenarios";
+import { MOCK_FACILITIES } from "@/data/facilities";
+import { summarizeRisk } from "@/services/risk-service";
+
+const PresentationMap = dynamic(() => import("@/components/map/kakao-map").then((value) => value.KakaoMap), { ssr: false });
+
+export function AdminPanel() {
+  const [allowed, setAllowed] = useState<boolean | null>(null); const [code, setCode] = useState(""); const [error, setError] = useState("");
+  useEffect(() => { fetch("/api/demo/auth").then((response) => response.json()).then((data) => setAllowed(Boolean(data.authenticated))).catch(() => setAllowed(false)); }, []);
+  async function login(event: React.FormEvent) { event.preventDefault(); const response = await fetch("/api/demo/auth", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code }) }); const data = await response.json(); if (response.ok) setAllowed(true); else setError(data.error ?? "접근 실패"); }
+  if (allowed === null) return <div className="h-72 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />;
+  if (!allowed) return <div className="mx-auto max-w-md py-16"><Card><CardHeader><CardTitle>데모 제어 접근</CardTitle></CardHeader><CardContent><p className="mb-4 text-sm text-slate-600 dark:text-slate-400">관리자 기능은 일반 사용자에게 노출되지 않습니다. 발표용 접근 코드를 입력하세요.</p><form onSubmit={login} className="space-y-3"><Input type="password" value={code} onChange={(event) => setCode(event.target.value)} placeholder="접근 코드" autoComplete="one-time-code" /><Button className="w-full">확인</Button>{error && <p role="alert" className="text-sm text-rose-600">{error}</p>}</form></CardContent></Card></div>;
+  return <DemoControls />;
+}
+
+function DemoControls() {
+  const store = useAppStore(); const { scenarioId, setScenarioId, date, setDate, seed, setSeed, simulationSettings, updateSimulationSettings, records, matches, notifications, saveVisit } = store;
+  const [playing, setPlaying] = useState(false); const [speed, setSpeed] = useState(1200); const [presentation, setPresentation] = useState(false); const summary = summarizeRisk(records);
+  useEffect(() => { if (!playing) return; const id = setInterval(() => setDate(format(addDays(parseISO(date), 1), "yyyy-MM-dd")), speed); return () => clearInterval(id); }, [playing, speed, date, setDate]);
+  function move(days: number) { setDate(format(addDays(parseISO(date), days), "yyyy-MM-dd")); }
+  function sampleVisit() { const region = REGIONS.find((item) => item.name === "상동")!; saveVisit({ id: `demo-${Date.now()}`, regionCode: region.code, regionName: region.name, note: "발표용 예시 방문", startDate: "2026-07-12", endDate: "2026-07-12", consent: true, createdAt: new Date().toISOString() }); }
+  async function showPresentation() { setPresentation(true); await document.documentElement.requestFullscreen?.().catch(() => undefined); }
+  if (presentation) return <div className="fixed inset-0 z-[100] overflow-auto bg-slate-950 p-5 text-white"><div className="mb-4 flex items-center justify-between"><div><p className="text-sm font-bold text-cyan-300">Mokpo WaterSafe · 가상 데이터 발표 모드</p><h1 className="text-3xl font-black">{date} 목포시 가상 위험 현황</h1></div><Button variant="secondary" onClick={() => { setPresentation(false); void document.exitFullscreen?.(); }}><Minimize className="size-4" />발표 모드 종료</Button></div><div className="grid gap-4 xl:grid-cols-[1.6fr_.7fr]"><PresentationMap records={records} className="min-h-[65vh]" /><div className="grid gap-4"><div className="rounded-2xl bg-slate-900 p-5"><p>현재 가상 위험 지역</p><p className="mt-2 text-3xl font-black">{summary.highest.regionName}</p><RiskBadge className="mt-3" level={summary.highest.riskLevel} score={summary.highest.riskScore} /></div><div className="grid grid-cols-2 gap-4"><div className="rounded-2xl bg-slate-900 p-5"><p>가상 확진 집계</p><p className="mt-2 text-4xl font-black">{summary.confirmed}</p></div><div className="rounded-2xl bg-slate-900 p-5"><p>수질 이상 지역</p><p className="mt-2 text-4xl font-black">{summary.waterAnomalies}</p></div></div><div className="rounded-2xl bg-slate-900 p-5"><p className="font-bold">방문 이력 위험 알림</p><p className="mt-2 text-lg">{matches[0]?.messages[0] ?? notifications[0]?.title ?? "현재 방문 일치 알림 없음"}</p></div><div className="rounded-2xl bg-slate-900 p-5"><p className="font-bold">가까운 예시 의료기관</p><p className="mt-2 text-xl">{MOCK_FACILITIES[0].name} · {MOCK_FACILITIES[0].distanceKm}km</p></div></div></div><div className="mt-5 flex items-center gap-3"><Button variant="secondary" onClick={() => move(-1)}>하루 전</Button><Button onClick={() => setPlaying(!playing)}>{playing ? <Pause className="size-4" /> : <Play className="size-4" />}{playing ? "일시 정지" : "자동 재생"}</Button><Button variant="secondary" onClick={() => move(1)}>하루 후</Button><input aria-label="발표용 확산 타임라인" type="range" min="0" max="45" value={Math.max(0, Math.round((parseISO(date).getTime() - parseISO("2026-07-01").getTime()) / 86400000))} onChange={(event) => setDate(format(addDays(parseISO("2026-07-01"), Number(event.target.value)), "yyyy-MM-dd"))} className="flex-1" /></div></div>;
+
+  return <>
+    <PageHeader title="관리자·데모 제어" description="seed·시나리오·설정·기준 날짜를 바꾸면 대시보드, 지도, 상세, 방문 매칭, 알림과 차트가 함께 갱신됩니다." actions={<Button variant="outline" onClick={showPresentation}><Maximize className="size-4" />전체 화면 발표</Button>} />
+    <div className="grid gap-4 lg:grid-cols-3"><Card className="lg:col-span-2"><CardHeader><CardTitle>가상 시나리오</CardTitle></CardHeader><CardContent className="grid gap-4 sm:grid-cols-2">
+      <label className="text-sm font-bold">시나리오<Select value={scenarioId} onChange={(event) => setScenarioId(event.target.value)} className="mt-1">{SCENARIOS.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
+      <label className="text-sm font-bold">seed<Input value={seed} onChange={(event) => setSeed(event.target.value)} className="mt-1" /></label>
+      <label className="text-sm font-bold">최초 발생 행정동<Select value={simulationSettings.initialRegionCode} onChange={(event) => updateSimulationSettings({ initialRegionCode: event.target.value })} className="mt-1">{REGIONS.map((region) => <option key={region.code} value={region.code}>{region.name}</option>)}</Select></label>
+      <label className="text-sm font-bold">확산 속도<Select value={simulationSettings.spreadSpeed} onChange={(event) => updateSimulationSettings({ spreadSpeed: Number(event.target.value) })} className="mt-1"><option value="1">빠름</option><option value="3">보통</option><option value="5">느림</option></Select></label>
+      <Range label="일일 증가율" value={(simulationSettings.dailyGrowthRate ?? .22) * 100} onChange={(value) => updateSimulationSettings({ dailyGrowthRate: value / 100 })} max={60} />
+      <Range label="수질 이상 확률" value={(simulationSettings.waterAnomalyProbability ?? .12) * 100} onChange={(value) => updateSimulationSettings({ waterAnomalyProbability: value / 100 })} />
+      <Range label="데이터 누락 확률" value={(simulationSettings.missingProbability ?? .05) * 100} onChange={(value) => updateSimulationSettings({ missingProbability: value / 100 })} />
+      <Range label="오래된 데이터 확률" value={(simulationSettings.staleProbability ?? .07) * 100} onChange={(value) => updateSimulationSettings({ staleProbability: value / 100 })} />
+    </CardContent></Card><Card><CardHeader><CardTitle>현재 위험 요약</CardTitle></CardHeader><CardContent><p className="text-sm">가장 높은 지역</p><p className="mt-1 text-2xl font-black">{summary.highest.regionName}</p><RiskBadge level={summary.highest.riskLevel} score={summary.highest.riskScore} className="mt-2" /><dl className="mt-5 grid grid-cols-2 gap-3 text-sm"><div><dt>가상 확진</dt><dd className="text-2xl font-black">{summary.confirmed}</dd></div><div><dt>수질 이상</dt><dd className="text-2xl font-black">{summary.waterAnomalies}</dd></div></dl></CardContent></Card></div>
+    <Card className="mt-4"><CardHeader><CardTitle>시간 이동</CardTitle></CardHeader><CardContent><div className="flex flex-wrap items-end gap-3"><label className="text-sm font-bold">기준 날짜<Input type="date" min="2026-07-01" max="2026-08-15" value={date} onChange={(event) => setDate(event.target.value)} className="mt-1" /></label><Button variant="outline" onClick={() => move(-7)}><Rewind className="size-4" />7일</Button><Button variant="outline" onClick={() => move(-1)}>하루 전</Button><Button onClick={() => setPlaying(!playing)}>{playing ? <Pause className="size-4" /> : <Play className="size-4" />}{playing ? "일시 정지" : "자동 재생"}</Button><Button variant="outline" onClick={() => move(1)}>하루 후</Button><Button variant="outline" onClick={() => move(7)}><FastForward className="size-4" />7일</Button><Select value={speed} onChange={(event) => setSpeed(Number(event.target.value))} className="w-32"><option value="2200">0.5×</option><option value="1200">1×</option><option value="500">2×</option></Select><Button variant="ghost" onClick={() => setDate("2026-07-01")}><RefreshCw className="size-4" />최초 날짜</Button><Button variant="ghost" onClick={() => setDate("2026-07-16")}>오늘 기준</Button></div><input aria-label="시뮬레이션 타임라인" type="range" min="0" max="45" value={Math.max(0, Math.round((parseISO(date).getTime() - parseISO("2026-07-01").getTime()) / 86400000))} onChange={(event) => setDate(format(addDays(parseISO("2026-07-01"), Number(event.target.value)), "yyyy-MM-dd"))} className="mt-6 w-full" /></CardContent></Card>
+    <Card className="mt-4"><CardHeader><CardTitle>발표용 즉시 작업</CardTitle></CardHeader><CardContent className="flex flex-wrap gap-3"><Button onClick={sampleVisit}>상동 방문 예시 생성</Button><Button variant="outline" onClick={() => setScenarioId("water-anomaly")}>상동 수질 이상 발생</Button><Button variant="outline" onClick={() => setScenarioId("visit-new-alert")}>방문 지역 경보 생성</Button><Button variant="outline" onClick={() => setScenarioId("alert-resolved")}>경보 해제</Button><Button variant="outline" onClick={() => setScenarioId("missing-data")}>데이터 누락</Button><Button variant="destructive" onClick={() => { setScenarioId("gradual-spread"); setSeed("mokpo-watersafe-2026"); setDate("2026-07-16"); updateSimulationSettings({ initialRegionCode: "46110756", dailyGrowthRate: .22, spreadSpeed: 3, waterAnomalyProbability: .12, missingProbability: .05, staleProbability: .07 }); }}>가상 데이터 초기화</Button></CardContent></Card>
+  </>;
+}
+
+function Range({ label, value, onChange, max = 100 }: { label: string; value: number; onChange: (value: number) => void; max?: number }) { return <label className="text-sm font-bold">{label} {Math.round(value)}%<Input type="range" min="0" max={max} value={Math.round(value)} onChange={(event) => onChange(Number(event.target.value))} className="mt-1" /></label>; }

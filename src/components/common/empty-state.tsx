@@ -1,0 +1,2 @@
+import { Inbox } from "lucide-react";
+export function EmptyState({ title, description }: { title: string; description: string }) { return <div className="flex min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 p-6 text-center dark:border-slate-700"><Inbox className="mb-3 size-8 text-slate-400" /><p className="font-bold">{title}</p><p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{description}</p></div>; }
