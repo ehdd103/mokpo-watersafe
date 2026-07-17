@@ -50,8 +50,12 @@ export type Visit = {
   note: string;
   startDate: string;
   endDate: string;
+  startTime?: string;
+  endTime?: string;
+  sequence?: number;
   consent: boolean;
   createdAt: string;
+  isMock?: boolean;
 };
 
 export type HealthAlert = {

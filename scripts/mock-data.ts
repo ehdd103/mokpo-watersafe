@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { REGIONS, REGION_ADJACENCY } from "../src/config/regions";
 import { SCENARIOS } from "../src/config/scenarios";
 import { HEALTHCARE_FACILITIES } from "../src/data/facilities";
+import { createDemoMovementRoute } from "../src/data/demo-movement-route";
 import { generateRecords } from "../src/features/simulation/generate";
 
 const root = path.resolve(process.cwd(), "data/mock");
@@ -22,7 +23,7 @@ async function generate(selectedScenario = scenarioId) {
     writeJson("regions.json", REGIONS.map((region) => ({ ...region, isMock: true, boundaryType: "approximate-center" }))),
     writeJson("water-quality.json", records), writeJson("disease-cases.json", records), writeJson("health-alerts.json", alerts),
     writeJson("healthcare-facilities.json", scenario.flags?.noFacilities ? [] : HEALTHCARE_FACILITIES),
-    writeJson("visit-history.json", [{ id: "demo-visit-sang", regionCode: "46110756", regionName: "상동", note: "발표용 예시", startDate: "2026-07-12", endDate: "2026-07-12", consent: true, createdAt: "2026-07-12T10:00:00+09:00", isMock: true }]),
+    writeJson("visit-history.json", createDemoMovementRoute(date)),
     writeJson("scenarios.json", SCENARIOS.map((item) => ({ ...item, isMock: true }))), writeJson("region-adjacency.json", REGION_ADJACENCY),
   ]);
   console.log(`Generated 8 mock files: scenario=${scenario.id}, date=${date}, seed=${seed}`);

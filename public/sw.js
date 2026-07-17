@@ -53,3 +53,16 @@ self.addEventListener("fetch", (event) => {
       }),
   );
 });
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const href = event.notification.data?.href || "/notifications";
+  const targetUrl = new URL(href, self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (clients) => {
+      const existing = clients.find((client) => client.url.startsWith(self.location.origin));
+      if (existing) { await existing.navigate(targetUrl); return existing.focus(); }
+      return self.clients.openWindow(targetUrl);
+    }),
+  );
+});

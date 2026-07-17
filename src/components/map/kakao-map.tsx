@@ -10,6 +10,7 @@ type KakaoMap = { setCenter(position: KakaoLatLng): void; getCenter(): KakaoLatL
 type KakaoLatLng = { getLat(): number; getLng(): number };
 type KakaoMarker = { setMap(map: KakaoMap | null): void };
 type KakaoCircle = { setMap(map: KakaoMap | null): void };
+type KakaoPolyline = { setMap(map: KakaoMap | null): void };
 type KakaoPlace = { x: string; y: string; place_name: string; address_name: string };
 type KakaoPlaces = {
   keywordSearch(
@@ -18,7 +19,7 @@ type KakaoPlaces = {
     options?: { location?: KakaoLatLng; radius?: number; size?: number },
   ): void;
 };
-type KakaoNamespace = { maps: { load(callback: () => void): void; LatLng: new (lat: number, lng: number) => KakaoLatLng; Map: new (element: HTMLElement, options: object) => KakaoMap; Marker: new (options: object) => KakaoMarker; Circle: new (options: object) => KakaoCircle; MarkerClusterer: new (options: { map: KakaoMap; averageCenter: boolean; minLevel: number; markers: KakaoMarker[] }) => object; event: { addListener(target: object, event: string, callback: () => void): void }; services: { Places: new () => KakaoPlaces; Status: { OK: string } } } };
+type KakaoNamespace = { maps: { load(callback: () => void): void; LatLng: new (lat: number, lng: number) => KakaoLatLng; Map: new (element: HTMLElement, options: object) => KakaoMap; Marker: new (options: object) => KakaoMarker; Circle: new (options: object) => KakaoCircle; Polyline: new (options: object) => KakaoPolyline; MarkerClusterer: new (options: { map: KakaoMap; averageCenter: boolean; minLevel: number; markers: KakaoMarker[] }) => object; event: { addListener(target: object, event: string, callback: () => void): void }; services: { Places: new () => KakaoPlaces; Status: { OK: string } } } };
 declare global { interface Window { kakao?: KakaoNamespace } }
 
 const colors = { unknown: "#64748b", normal: "#0f766e", interest: "#ca8a04", caution: "#ea580c", warning: "#e11d48" };
@@ -64,6 +65,8 @@ export function KakaoMap({ records, selectedCode, onSelect, showWater = true, sh
         if (showDisease || (showAlerts && ["caution", "warning"].includes(record.riskLevel))) { const marker = new maps.Marker({ position, title: `${record.regionName} ${RISK_META[record.riskLevel].label}` }); markers.push(marker); maps.event.addListener(marker, "click", () => onSelect?.(record.regionCode)); }
       });
       visits.forEach((visit) => { const position = positionByRegion.get(visit.regionCode); if (position) markers.push(new maps.Marker({ position: new maps.LatLng(position.getLat() - .0015, position.getLng()), title: `${visit.regionName} 사용자 방문 기록` })); });
+      const routePath = [...visits].sort((a, b) => (a.sequence ?? 999) - (b.sequence ?? 999) || `${a.startDate}${a.startTime ?? ""}`.localeCompare(`${b.startDate}${b.startTime ?? ""}`)).map((visit) => positionByRegion.get(visit.regionCode)).filter((position): position is KakaoLatLng => Boolean(position));
+      if (routePath.length > 1) { const routeLine = new maps.Polyline({ path: routePath, strokeWeight: 5, strokeColor: "#7c3aed", strokeOpacity: .85, strokeStyle: "solid" }); routeLine.setMap(map); }
       facilities.forEach((facility) => markers.push(new maps.Marker({ position: new maps.LatLng(facility.latitude, facility.longitude), title: facility.name })));
       if(userPosition&&userPosition.latitude>=34.75&&userPosition.latitude<=34.86&&userPosition.longitude>=126.33&&userPosition.longitude<=126.49){const current=new maps.LatLng(userPosition.latitude,userPosition.longitude);markers.push(new maps.Marker({position:current,title:"현재 위치 (저장하지 않음)"}));map.setCenter(current);}
       if (markers.length) new maps.MarkerClusterer({ map, averageCenter: true, minLevel: 6, markers });
